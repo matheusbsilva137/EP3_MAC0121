@@ -1,0 +1,1310 @@
+
+<!-- saved from url=(0064)https://www.ime.usp.br/~cris/mac121/eps/ep3/enunciado/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+  <title>MAC0121 Algoritmos e Estruturas de Dados I</title>
+  <link rel="stylesheet" href="./enunciado_files/eps.css" type="text/css">
+</head>
+<body cz-shortcut-listen="true">
+
+
+<p align="right">
+<small><b><a href="http://www.ime.usp.br/mac/">Departamento de Ciência da Computação</a>
+ - <a href="http://www.ime.usp.br/">IME</a> - <a href="http://www.usp.br/">USP</a></b></small><br>
+
+</p>
+<h1>MAC0121 Algoritmos e Estruturas de Dados I</h1>
+
+<h2>Segundo Semestre de 2019</h2>
+
+<h3 class="center">Terceiro Exercício Programa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</h3>
+
+<p>&nbsp;</p>
+<h2 class="titulo">Pitão I</h2>
+
+<p>&nbsp;</p>
+<hr>
+<h2>
+Objetivos
+</h2>
+<p>
+O objetivo desse terceiro exercício-programa é treinar a 
+</p><ol>
+<li>utilização de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/stru.html">registros e structs</a>,
+</li><li>utilização de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/aloca.html">alocação dinâmica de memória</a>,
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/lista.html">listas encadeadas</a> com cabeça,
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/pilha.html">pilhas</a>,
+</li><li>manipulação de <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/fila.html">filas</a>,
+</li><li>familiarização com <a href="http://www.ime.usp.br/~pf/algoritmos/aulas/pilha.html#infixa">notação posfixa (polonesa reversa)</a>.
+</li></ol>
+De quebra todos utilizarão mais interfaces e experimentarão um pouco do 
+processo envolvido na compilação de expressões e o papel da precedência 
+dos operadores em tudo isso.
+<p></p>
+<p>
+Depois de fazer o EP3 e EP4 todos passarão a entender melhor o significados de expressões em <tt>C</tt> como:
+<!-- HTML generated using hilite.me --></p><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">    <span style="color: #AA22FF; font-weight: bold">if</span> ((x <span style="color: #666666">=</span> stackPop()) <span style="color: #666666">!=</span> <span style="color: #BB4444">'#'</span>) <span style="color: #666666">&amp;&amp;</span> (x <span style="color: #666666">!=</span> <span style="color: #BB4444">')'</span>) <span style="color: #666666">||</span> (x <span style="color: #666666">==</span> <span style="color: #BB4444">'+'</span>) ) {...}
+
+    a <span style="color: #666666">=</span> b <span style="color: #666666">=</span> c <span style="color: #666666">=</span> <span style="color: #666666">5</span>;
+
+    <span style="color: #AA22FF; font-weight: bold">if</span> (a <span style="color: #666666">&lt;</span> b <span style="color: #666666">&lt;</span> c) {...} <span style="color: #008800; font-style: italic">/* nada a ver com semantica em Python */</span>
+
+    <span style="color: #AA22FF; font-weight: bold">while</span> (<span style="color: #666666">!</span>achou <span style="color: #666666">||</span> continua) {...}
+</pre></div>
+<p>
+Este EP é uma adaptação do
+<a href="http://www.ime.usp.br/~hitoshi/mac0122-2012/ep3/">EP3 de MAC0122 em 2012</a> de autoria do professor Carlos Hitoshi Morimoto.
+
+</p> 
+<p>&nbsp;</p>
+<hr>
+<h2>
+Introdução
+</h2>
+
+<p>
+Neste EP você escreverá um programa que 
+ <font color="red">lê</font> de um arquivo ou de um <i>prompt</i>  
+expressões aritméticas em notação posfixa (= notação polonesa reversa) e
+<font color="red">calcula e imprime</font> o 
+resultado de cada uma das expressões.
+
+</p><p>
+Tudo que você fizer no EP3 será utilizado no EP4, 
+<font color="red">Pitão II</font> para a construção de uma
+calculadora de expressões infixas. 
+
+</p><p>
+Cada expressão pode conter números e os seguintes símbolos correspondentes a
+6 operadores relacionais, 8 operadores aritméticos e 3 operadores lógicos: 
+</p><center>
+<table border="1">
+  <colgroup><col align="left">
+  <col align="center">
+</colgroup><tbody><tr>
+<th>operação</th>
+<th>símbolo</th>
+</tr>
+
+<tr>
+<td>igual</td>
+<td align="center"><tt>==</tt></td>
+</tr>
+
+
+<tr>
+<td>diferente</td>
+<td align="center"><tt>!=</tt></td>
+</tr>
+
+
+<tr>
+<td>maior ou igual</td>
+<td align="center"><tt>&gt;=</tt></td>
+</tr>
+
+
+<tr>
+<td>menor ou igual</td>
+<td align="center">&lt;=</td>
+</tr>
+
+
+<tr>
+<td>maior</td>
+<td align="center"> <tt>&gt;</tt></td>
+</tr>
+
+
+<tr>
+<td>menor</td>
+<td align="center"> <tt>&lt;</tt></td>
+</tr>
+
+<tr>
+<td>exponenciação</td>
+<td align="center"> <tt>**</tt></td>
+</tr>
+
+
+<tr>
+<td>resto de divisão</td>
+<td align="center"> <tt>%</tt></td>
+</tr>
+
+
+<tr>
+<td>multiplicação</td>
+<td align="center"> <tt>*</tt></td>
+</tr>
+
+
+<tr>
+<td>divisão</td>
+<td align="center"> <tt>/</tt></td>
+</tr>
+
+<tr>
+<td>divisão inteira</td>
+<td align="center"> <tt>//</tt></td>
+</tr>
+
+<tr>
+<td>adição</td>
+<td align="center"> <tt>+</tt></td>
+</tr>
+
+
+<tr>
+<td>subtração</td>
+<td align="center"> <tt>-</tt></td>
+</tr>
+
+<tr>
+<td>menos unário</td>
+<td align="center"> <tt>_</tt></td>
+</tr>
+
+<tr>
+<td>e lógico</td>
+<td align="center"><tt>and</tt></td>
+</tr>
+
+<tr>
+<td>ou lógico</td>
+<td align="center"><tt>or</tt></td>
+</tr>
+
+<tr>
+<td>negação</td>
+<td align="center"> <tt>not</tt></td>
+</tr>
+
+</tbody></table>
+</center>
+<p></p> 
+
+<!------------------------------------------------------------------------------>
+
+<hr>
+<h2>
+Comportamento do programa
+</h2>
+
+<p>
+O programa <tt>pitao</tt>, quando invocado com a opção "<tt>-h</tt>" (<i><font color="red">h</font>elp</i>) 
+mostra como deve ser utilizado. Nos exemplos de execução do programa, o texto 
+em <font color="red">vermelho</font> foi digitado pelo usuário.
+</p><pre class="code">prompt&gt; <font color="red">./pitao -h</font>
+./pitao: Uso 
+prompt&gt; ./pitao [-h] [-i | -s&lt;nome-script&gt; ] [-l] [-v]
+    -h = mostra como usar o programa e abandona o programa
+    -i = executa em modo interativo
+    -s&lt;nome-script&gt; = calcula as expressoes no arquivo &lt;nome-script&gt;
+    -l = mostra fila de itens lexicos
+    -v = mostra fila de valores
+    -p = mostra a pilha de execucao apos cada operacao
+</pre>
+<p></p>
+O programa deve ler uma sequência de linhas (<i>strings</i>).
+O maior comprimento de uma linha esta definido em <tt>main.c</tt>.
+
+<pre class="code"><font color="red">Copiado de main.c</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666">/*</span> numero maximo de caracteres em um linha <span style="color: #666666">*/</span>
+<span style="color: #008800; font-style: italic">#define MAX_TAMANHO 128 </span>
+</pre></div>
+</pre>
+
+O programa supõe que cada linha contém uma expressão
+<font color="red"><b>sintaticamente correta</b></font>
+em notação posfixa. 
+Exemplos de expressões que devem ser avaliadas pelo programa são:
+<pre class="saida">2 2.5 +
+25.6 4.2 3.1 * -
+12 4.3 2.1 / - 3 * 15 - 
+3 4 2 ** **
+1 0 and 5 or 6 +
+5 6 &lt;=
+6 3.3 %
+</pre>
+Para cada expressão posfixa o programa deve calcular e imprimir o seu valor.
+
+<!---....................................................................-->
+<h3>
+Modo interativo ou script
+</h3>
+
+<p>
+O programa <tt>pitao</tt> pode ser usado no modo <font color="red"><b>interativo</b></font>
+(opção "<tt>-i</tt>", <i>default</i>) ou no modo <font color="red"><b>script</b></font>.
+No modo interativo, um <i>prompt</i> (<tt>&gt;&gt;&gt;</tt>) é apresentado no início de cada linha
+para que a expressão seja digitada e lida. A seguir, as expressões
+em <font color="red">vermelho</font> foram digitadas e os seus valores calculados. 
+</p><pre class="code">prompt&gt; <font color="red">./pitao -i</font>
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">2 2.5 +</font>
+4.500000
+&gt;&gt;&gt; <font color="red">25.6 4.2 3.1 * -</font>
+12.580000
+&gt;&gt;&gt; <font color="red">12 4.3 2.1 / - 3 * 15 -</font>
+14.857143
+&gt;&gt;&gt; <font color="red">3 2 2 ** **</font>        
+81.000000 
+&gt;&gt;&gt; <font color="red">1 0 and 5 or 6 +</font>
+11.000000
+&gt;&gt;&gt; <font color="red">5 6 &lt;=</font>
+1.000000
+&gt;&gt;&gt; <font color="red">6 3.3 %</font>
+2.700000
+</pre>
+Para executar <tt>pitao</tt> no modo <font color="red"><b>script</b></font>,
+o nome
+de um arquivo contendo as expressões deve ser fornecido ao programa através da opção
+"<tt>-s</tt>". Por exemplo, se o conteúdo de um arquivo <tt>entrada.txt</tt> é
+<pre class="saida"><font color="red"># este e' um comentario</font>
+2 2.5 +
+2 3 -
+2.1 2 *
+6.4 .8 /
+3.1 not
+2 3 **   
+
+25.6 4.2 3.1 * -
+12 4.3 2.1 / - 3 * 15 - 
+1 1 0 or and
+5.1 _  <font color="red"># '_' e' o menos unario</font>
+6.2 2.7 % <font color="red"># vixe, como funciona esse tal %?</font>
+6.2 2.7 /
+2 0 or
+5 not
+</pre>
+Para calcular todas as expressões de um arquivo de nome <tt><font color="green">entrada.txt</font></tt>
+no modo <i>script</i>, basta chamar o programa com a opção
+"<tt>-s<font color="green">entrada.txt</font></tt>", sem espaços entre o 
+"<tt>-s</tt>" e o nome do arquivo.
+<pre class="code">prompt&gt; <font color="red">./pitao -s<font color="green">entrada.txt</font></font>
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+Linha 0: # este e' um comentario 
+
+Linha 1: 2 2.5 +
+4.500000
+
+Linha 2: 2 3 -
+-1.000000
+
+Linha 3: 2.1 2 *
+4.200000
+
+Linha 4: 6.4 .8 /
+8.000000
+
+Linha 5: 3.1 not
+0.000000
+
+Linha 6: 2 3 **   
+8.000000
+
+Linha 7: 
+
+Linha 8: 25.6 4.2 3.1 * -
+12.580002
+
+Linha 9: 12 4.3 2.1 / - 3 * 15 - 
+14.857143
+
+Linha 10: 1 1 0 or and
+1.000000
+
+Linha 11: 5.1 _  # '_' e o menos unario
+-5.100000
+
+Linha 12: 6.2 2.7 % # vixe, como funciona esse tal %?
+0.800000
+
+Linha 13: 6.2 2.7 /
+2.296296
+
+Linha 14: 2 0 or
+1.000000
+
+Linha 15: 5 not
+0.000000
+</pre>
+
+<!---....................................................................-->
+<h3>
+Analise léxica
+</h3>
+
+<p> Após a leitura de cada linha, o programa faz uma <font color="red"><i>análise léxica</i></font> (<a href="http://en.wikipedia.org/wiki/Lexical_analysis">http://en.wikipedia.org/wiki/Lexical_analysis</a>)
+dos elementos da linha. Neste EP o analisador léxico recebe uma linha
+com uma expressão em notação posfixa e produz como saída uma lista
+(fila) de pares da forma
+</p><blockquote>
+(<font color="red"><i>item</i></font>, <font color="green"><i>categoria</i></font>)
+</blockquote>
+Um <font color="red"><i>item léxico</i></font>
+(<a href="http://en.wikipedia.org/wiki/Lexical_item"><i>token</i></a>) é uma
+cadeia de caracteres (string) 
+que representa um elemento básico de uma linguagem.
+Os itens léxicos são classificados em unidades léxicas.
+Neste EP, essas unidades léxicas são indicadas pelo componente 
+<font color="green"><i>categoria</i></font> do par.
+Ao executarmos o programa <tt>pitao</tt> com a opção <font color="red"><tt>"-l"</tt></font>,
+o programa passa a apresentar a análise léxica dos itens que formam cada linha, ou seja,
+passa a exibir os pares da forma (<font color="red"><i>item</i></font>, <font color="green"><i>categoria</i></font>) correspondentes aos itens na linha.
+<pre class="code">prompt&gt; <font color="red">./pitao -i -l</font>
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">12 4.3 2.1 / - 3 * 15 -</font> 
+
+==========================
+  Fila de itens lexicos  
+  item  (categoria)
+. . . . . . . . . . . . .
+  "12"  (string representando int)
+  "4.3"  (string representando float)
+  "2.1"  (string representando float)
+  "/"  (operador aritmetico divisao)
+  "-"  (operador aritmetico subtracao)
+  "3"  (string representando int)
+  "*"  (operador aritmetico multiplicacao)
+  "15"  (string representando int)
+  "-"  (operador aritmetico subtracao)
+  
+14.857143
+&gt;&gt;&gt; <font color="red">1 1 0 or and</font>
+
+==========================
+  Fila de itens lexicos  
+  item  (categoria)
+. . . . . . . . . . . . .
+  "1"  (string representando int)
+  "1"  (string representando int)
+  "0"  (string representando int)
+  "or"  (operador logico ou)
+  "and"  (operador logico e)
+  
+1.000000
+&gt;&gt;&gt; 
+</pre>
+Por simplicidade, neste EP só teremos constantes numéricas e todas
+serão consideradas como sendo um <tt>float</tt> do Python (<tt>double</tt> do C).
+No programa, essas constantes serão armazenadas em variáveis do tipo
+<tt>double</tt> já que o <tt>float</tt> do Python corresponde ao
+<tt>double</tt> do <tt>C</tt>. Assim, no exemplo acima, o número 1
+será armazenado em uma variável <tt>double</tt> (1.0).
+<p></p>
+
+<p>
+As categorias a que um item pode pertencer neste EP3
+estão definidas no arquivo <tt>categorias.h</tt>
+através da declaração de uma tabela. 
+</p><pre class="code"><font color="red">Copiado de categorias.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666; font-style: italic">/*-------------------------------------------------------------*/</span>
+<span style="color: #666666; font-style: italic">/* temos 32 categorias de itens lexicos                        */</span>
+<span style="color: #008800">#define MAX_CATEGORIAS  32</span>
+
+<span style="color: #AA22FF; font-weight: bold">enum</span> listaCategorias
+{
+    <span style="color: #666666; font-style: italic">/* 4 operadores relacionais com 2 simbolos  */</span>
+    <span style="color: #666666; font-style: italic">/*                   simbolo, constante     */</span> 
+    OPER_IGUAL           <span style="color: #008800; font-style: italic">/* "==",  0 */</span>
+    ,OPER_DIFERENTE      <span style="color: #008800; font-style: italic">/* "!=",  1 */</span>
+    ,OPER_MAIOR_IGUAL    <span style="color: #008800; font-style: italic">/* "&gt;=",  2 */</span>
+    ,OPER_MENOR_IGUAL    <span style="color: #008800; font-style: italic">/* "&lt;=",  3 */</span>
+    
+    <span style="color: #666666; font-style: italic">/* 2 operadores aritmetico com 2 simbolos */</span>
+    ,OPER_EXPONENCIACAO  <span style="color: #008800; font-style: italic">/* "**",  4 */</span>
+    ,OPER_DIVISAO_INT    <span style="color: #008800; font-style: italic">/* "//",  5 */</span>
+
+    <span style="color: #666666; font-style: italic">/* 2 operadores relacionais com 1 simbolo */</span>
+    ,OPER_MAIOR          <span style="color: #008800; font-style: italic">/* "&gt;",   6  */</span>
+    ,OPER_MENOR          <span style="color: #008800; font-style: italic">/* "&lt;",   7  */</span>  
+    
+    <span style="color: #666666; font-style: italic">/* 6 operadores aritmeticos  */</span>
+    ,OPER_RESTO_DIVISAO  <span style="color: #008800; font-style: italic">/* "%",   8 */</span>
+    ,OPER_MULTIPLICACAO  <span style="color: #008800; font-style: italic">/* "*",   9 */</span>
+    ,OPER_DIVISAO        <span style="color: #008800; font-style: italic">/* "/",  10 */</span>
+    ,OPER_ADICAO         <span style="color: #008800; font-style: italic">/* "+",  11 */</span>
+    ,OPER_SUBTRACAO      <span style="color: #008800; font-style: italic">/* "-",  12 */</span> 
+    ,OPER_MENOS_UNARIO   <span style="color: #008800; font-style: italic">/* "_",  13 */</span>  
+    
+    <span style="color: #666666; font-style: italic">/* 3 operadores logicos  */</span>
+    ,OPER_LOGICO_AND     <span style="color: #008800; font-style: italic">/* "and", 14 */</span> 
+    ,OPER_LOGICO_OR      <span style="color: #008800; font-style: italic">/* "or", 15 */</span>
+    ,OPER_LOGICO_NOT     <span style="color: #008800; font-style: italic">/* "not" , 16 */</span>
+    
+    <span style="color: #666666; font-style: italic">/* operador de indexacao */</span>
+    ,OPER_INDEXACAO     <span style="color: #008800; font-style: italic">/* "$" , 17 */</span> <span style="color: #008800; font-style: italic">/*IGNORAR*/</span>
+    
+    <span style="color: #666666; font-style: italic">/* atribuicao */</span> 
+    ,OPER_ATRIBUICAO    <span style="color: #008800; font-style: italic">/* "=" , 18 */</span> 
+
+    <span style="color: #666666; font-style: italic">/* parenteses para expressoes */</span>
+    ,ABRE_PARENTESES     <span style="color: #008800; font-style: italic">/* "(" , 19 */</span>  <span style="color: #008800; font-style: italic">/*EP4*/</span>
+    ,FECHA_PARENTESES    <span style="color: #008800; font-style: italic">/* ")" , 20 */</span>  <span style="color: #008800; font-style: italic">/*EP4*/</span>
+    
+    <span style="color: #666666; font-style: italic">/* colchetes para listas */</span>
+    ,ABRE_COLCHETES      <span style="color: #008800; font-style: italic">/* "[" , 21 */</span>   <span style="color: #008800; font-style: italic">/*IGNORAR*/</span>
+    ,FECHA_COLCHETES     <span style="color: #008800; font-style: italic">/* "]" , 22 */</span>   <span style="color: #008800; font-style: italic">/*IGNORAR*/</span>
+
+    <span style="color: #666666; font-style: italic">/* strings representando constantes */</span>
+    ,BOOL_STR           <span style="color: #008800; font-style: italic">/*       23 */</span>
+    ,FLOAT_STR          <span style="color: #008800; font-style: italic">/*       24 */</span>
+    ,INT_STR            <span style="color: #008800; font-style: italic">/*       25 */</span>
+
+    <span style="color: #666666; font-style: italic">/* categorias das constantes */</span>
+    ,STR                <span style="color: #008800; font-style: italic">/*       26 */</span>
+    ,BOOL               <span style="color: #008800; font-style: italic">/*       27 */</span>
+    ,FLOAT              <span style="color: #008800; font-style: italic">/*       28 */</span>
+    ,INT                <span style="color: #008800; font-style: italic">/*       29 */</span>
+     
+    <span style="color: #666666; font-style: italic">/* identificador */</span> 
+    ,ID          <span style="color: #008800; font-style: italic">/* nome do identificador, 30 */</span> <span style="color: #008800; font-style: italic">/*EP4*/</span> 
+
+    <span style="color: #666666; font-style: italic">/* categoria indefinida */</span> 
+    ,INDEFINIDA         <span style="color: #008800; font-style: italic">/*  31 */</span> 
+
+};
+<span style="color: #AA22FF; font-weight: bold">typedef</span> <span style="color: #AA22FF; font-weight: bold">enum</span> listaCategorias Categoria; 
+
+</pre></div>
+</pre>
+
+<p>
+A análise léxica é feita pela função
+</p><pre class="code"><font color="red">Copiado de lexer.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+<span style="color: #00A000">crieFilaItens</span> (<span style="color: #00BB00; font-weight: bold">char</span> linha[]);
+</pre></div>
+</pre>
+que faz parte do esqueleto e está <font color="red"><b>totalmente feita</b></font>
+no módulo <tt>lexer.c</tt>. A descrição da função está no esqueleto.
+<p></p>
+
+<!---....................................................................-->
+<h3>
+Itens para valores
+</h3>
+
+<p>
+Ao final da análise léxica, temos uma fila de pares da forma
+</p><blockquote>
+(<font color="red"><i>item</i></font>, <font color="green"><i>categoria</i></font>),
+</blockquote>
+onde <font color="red"><i>item</i></font> é um <i>string</i> representando o item
+léxico encontrado. Cada um desses itens (strings) será substituido por um valor e assim obteremos uma fila de pares da forma
+<blockquote>
+(<font color="red"><i>valor</i></font>, <font color="green"><i>categoria</i></font>),
+</blockquote>
+Se a linha lida contém a expressão
+<pre class="saida">3.14 5 +
+</pre>
+a análise léxica produzirá os pares
+<pre class="code">(<font color="red"><tt>"3.14"</tt></font>, <font color="green"><tt>FLOAT_STR</tt></font>)
+(<font color="red"><tt>"5"</tt></font>, <font color="green"><tt>INT_STR</tt></font>)
+(<font color="red"><tt>"+"</tt></font>, <font color="green"><tt>OPER_ADICAO</tt></font>)
+</pre>
+Na próxima fase, antes de partirmos para os cálculos das expressões, esses strings são substituidos por números da seguinte maneira:
+<ul>
+  <li> se a categoria do item é <tt>FLOAT_STR</tt> (string representando um float) ou <tt>INT_STR</tt> (string representando um int) 
+   então o item do par é substituído pelo <tt>double</tt> correspondente;
+  </li><li> se a categoria de item corresponde a um operador, o item do par é
+    substituído por um número inteiro representando a precedência do operador  
+</li></ul>
+Em ambos os casos a categoria do item é alterada para <tt>FLOAT</tt>.
+Para o exemplo de pares acima, o resultado dessa substituição é
+<pre class="code">(<font color="red"><tt>3.14</tt></font>, <font color="green"><tt>FLOAT</tt></font>)
+(<font color="red"><tt>5.0</tt></font>, <font color="green"><tt>FLOAT</tt></font>)
+(<font color="red"><tt>6</tt></font>, <font color="green"><tt>OPER_ADICAO</tt></font>)
+</pre>
+<p></p>
+<p>
+Se o programa <tt>pitao</tt> é executado com a opção <font color="red"><tt>"-v"</tt></font>, 
+esses pares de valores e categorias passam a ser exibidos.
+</p><pre class="code">prompt&gt; <font color="red">./pitao -l -v</font>
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; 3.14 5 +
+
+==========================
+  Fila de itens lexicos  
+  item  (categoria)
+. . . . . . . . . . . . .
+  "3.14"  (string representando float)
+  "5"  (string representando int)
+  "+"  (operador aritmetico adicao)
+
+
+==========================
+  Fila de valores   
+  valor  (categoria)
+. . . . . . . . . . . . . .
+  3.140000  (valor float)
+  5.000000  (valor float)
+  prec=6  (operador aritmetico adicao)
+
+8.140000
+&gt;&gt;&gt;
+</pre>
+<p>
+A <font color="red"><b>precedência entre os  operadores</b></font>
+não será utilizada neste EP, mas será fundamental
+no EP4. A precedência entre os operadores está na tabela a
+seguir que foi copiada da página
+<a href="http://www.ime.usp.br/~pf/algoritmos/apend/precedence.html">Precedência entre operadores em C</a> de <a href="http://www.ime.usp.br/~pf">Paulo Feofiloff</a>. 
+Aqui transparece um pouco da esquizofrenia do EP3 e EP4.
+A sintaxe e a semântica das operação serão herdadas do Python, 
+já algumas coisas serão herdadas do C.
+Em C não existe o operador '//' (divisão inteira) e escrevemos '&amp;&amp;', '||' e '!' em vez de 'and', 'or' e 'not'. 
+
+
+</p><center>
+<table class="BB" align="center" cellspacing="2" cellpadding="4">
+
+
+<tbody><tr id="unary">
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>_&nbsp;  not&nbsp; ^</tt>
+</td><td>direita-para-esquerda
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>*&nbsp; /&nbsp; %&nbsp; //</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>+&nbsp; -</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>&lt;&nbsp; &lt;=&nbsp; &gt;=&nbsp; &gt;</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>==&nbsp; !=</tt>
+</td><td>esquerda-para-direita
+
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>and</tt>
+</td><td>esquerda-para-direita
+
+
+</td></tr><tr>
+<td>&nbsp;
+</td><td align="center" bgcolor="#c5d2ec"><tt>or</tt>
+</td><td>esquerda-para-direita
+
+<!--
+<TR>
+<td>&nbsp;
+<td align="center" bgcolor="#c5d2ec"><tt>=&nbsp;</tt>
+<td>direita-para-esquerda
+-->
+</td></tr></tbody></table>
+</center>
+<p></p>
+
+<p>
+Valores inteiros associados a cada operador estão codificados na tabela
+</p><pre class="code"><font color="red">Copiado de eval.c</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666">/*------------------------------------------------------------*/</span>
+<span style="color: #666666">/*</span> Tabela com uma representacao da precedencia dos operadores
+ <span style="color: #666666">*</span> atraves de valores inteiros<span style="color: #666666">.</span> 
+ <span style="color: #666666">*</span> Quanto maior o valor, maior a precedencia<span style="color: #666666">.</span>
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>  http:<span style="color: #666666">//</span>www<span style="color: #666666">.</span>ime<span style="color: #666666">.</span>usp<span style="color: #666666">.</span>br<span style="color: #666666">/~</span>pf<span style="color: #666666">/</span>algoritmos<span style="color: #666666">/</span>apend<span style="color: #666666">/</span>precedence<span style="color: #666666">.</span>html
+ <span style="color: #666666">*/</span>
+static const <span style="color: #AA22FF">int</span> precedencia[MAX_OPERADORES] <span style="color: #666666">=</span>
+{
+    [<span style="color: #666666">... código removido ...</span>]
+}; 
+</pre></div>
+</pre>
+definida no módulo <tt>eval.c</tt> e faz parte do esqueleto.
+<p></p>
+
+<p>
+No EP a função responsável pela substituição dos itens por valores,
+strings (<tt>FLOAT_STR</tt> e <tt>INT_STR</tt>) para floats (<tt>FLOAT</tt>) ou strings
+de operadores para ints (precedências) é
+</p><pre class="code"><font color="red">Copiado de eval.c</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">void
+itensParaValores(CelObjeto <span style="color: #666666">*</span>iniFilaItens);
+</pre></div>
+</pre>
+que está no módulo <tt>eval.c</tt> e que você deverá escrever.
+<p></p>
+
+
+<!---....................................................................-->
+<h3>
+Valores de expressões
+</h3>
+
+<p>
+Para calcular o valor de uma expressão, o programa simula uma <font color="red"><i>pilha de execução</i></font>. 
+Se <tt>pitao</tt> for executado com a opção <font color="red"><tt>"-p"</tt></font>, 
+essa pilha de execução é exibida após cada valor ser empilhado ou desempilhado.
+</p><pre class="code">prompt&gt; <font color="red">./pitao -p</font>
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">5 6 % 2 3 ** -</font>           
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  6.000000
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  2.000000
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  3.000000
+  2.000000
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  8.000000
+  5.000000
+
+
+==========================
+  Pilha de execucao
+  valor
+. . . . . . . . . . . . . . .
+  -3.000000
+
+-3.000000
+&gt;&gt;&gt;
+</pre>
+No EP o responsável por este cálculo será a função
+<pre class="code"><font color="red">Copiado de eval.c</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+<span style="color: #AA22FF">eval</span> (CelObjeto <span style="color: #666666">*</span>iniPosfixa, Bool mostrePilhaExecucao);
+</pre></div>
+</pre>
+que está no módulo <tt>eval.c</tt> e que você deverá escrever.
+
+<p></p>
+
+
+<!--************************************************************************-->
+<hr>
+<h2>
+Representações de itens, valores, filas e pilha de execução
+</h2>
+
+<p>
+A estrutura mais básica e fundamental neste EP é a <font color="green"><tt>CelObjeto</tt></font>.
+</p><pre class="code"><font color="red">Copiado de objetos.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666">/*--------------------------------------------------------------*/</span>
+<span style="color: #666666">/*</span> CelObjeto e o tipo da celula utilizada para representar
+ <span style="color: #666666">*</span> todas <span style="color: #AA22FF; font-weight: bold">as</span> listas (pilhas ou filas) neste EP<span style="color: #666666">.</span>
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span> Campo CATEGORIA
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>     Indica a categoria a qual o objeto pertence<span style="color: #666666">.</span> Pode ser
+ <span style="color: #666666">*</span>     um operador (OPER_<span style="color: #666666">*</span>, um inteiro (INT), um double (FLOAT)<span style="color: #666666">...</span> 
+ <span style="color: #666666">*</span>     Ver a lista de categorias em categorias<span style="color: #666666">.</span>h<span style="color: #666666">.</span>
+ <span style="color: #666666">*</span> 
+ <span style="color: #666666">*</span> Campo VALOR
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>     Logo apos a analise lexica o campo valor contem um 
+ <span style="color: #666666">*</span>     string (valor<span style="color: #666666">.</span>pStr) que representa o item lexico<span style="color: #666666">.</span>
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>     Depois, esses strings serao substituidos pela funcao 
+ <span style="color: #666666">*</span>     itensParaValores (<span style="color: #AA22FF">eval</span><span style="color: #666666">.</span>c) por outros valores<span style="color: #666666">.</span>
+ <span style="color: #666666">*</span>     Esses outros valores dependem da categoria a que 
+ <span style="color: #666666">*</span>     o item pertence da seguinte maneira:
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>          <span style="color: #666666">-</span> INT   : valor(<span style="color: #666666">.</span>vInt) contera um inteiro;
+ <span style="color: #666666">*</span>          <span style="color: #666666">-</span> FLOAT : valor(<span style="color: #666666">.</span>vFloat) contera um double;
+ <span style="color: #666666">*</span>          <span style="color: #666666">-</span> OPER_<span style="color: #666666">*</span>: valor(<span style="color: #666666">.</span>vInt) contera um inteiro indicando a 
+ <span style="color: #666666">*</span>                  a precedencia do operador. 
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span> Campo PROX
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>     Ponteiro para a proxima celula<span style="color: #666666">.</span> 
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*/</span>
+
+typedef struct celObjeto CelObjeto;
+struct celObjeto 
+{
+    Categoria  categoria;  <span style="color: #666666">/*</span> indica a categoria ao objeto <span style="color: #666666">*/</span>
+    Valor          valor;  <span style="color: #666666">/*</span> representacao do <span style="color: #BB4444">'valor'</span> do Objeto <span style="color: #666666">*/</span>
+    CelObjeto      <span style="color: #666666">*</span>prox;  <span style="color: #666666">/*</span> ponteiro para a proxima celula <span style="color: #666666">*/</span>	
+};
+</pre></div>
+</pre>
+O verdadeiro conteúdo de uma célula <font color="green"><tt>CelObjeto</tt></font>
+está no campo <tt>util</tt> e, dependendo do conteúdo do campo <tt>categoria</tt>,
+pode ser um <tt>double</tt>, um <tt>int</tt> ou um string.
+<pre class="code"><font color="red">Copiado de objetos.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666">/*---------------------------------------------------------------*/</span>
+<span style="color: #666666">/*</span> Um CelObjeto contem um valor que pode ser: 
+ <span style="color: #666666">*</span>
+ <span style="color: #666666">*</span>    <span style="color: #666666">-</span> um inteiro (<span style="color: #BB4444">'vInt'</span>   <span style="color: #666666">=</span> valor <span style="color: #AA22FF">int</span>) ou
+ <span style="color: #666666">*</span>    <span style="color: #666666">-</span> um <span style="color: #AA22FF">float</span>   (<span style="color: #BB4444">'vFloat'</span> <span style="color: #666666">=</span> valor double) ou
+ <span style="color: #666666">*</span>    <span style="color: #666666">-</span> um string  (<span style="color: #BB4444">'pStr'</span>   <span style="color: #666666">=</span> valor string <span style="color: #666666">=</span> ponteiro para char)
+ <span style="color: #666666">*/</span>
+union valor
+{
+    <span style="color: #666666">/*</span> para precedencia de operadores (OPER_*)<span style="color: #666666">*</span> <span style="color: #666666">*/</span>
+    <span style="color: #AA22FF">int</span>    vInt;    
+    
+    <span style="color: #666666">/*</span> para tipo FLOAT: <span style="color: #AA22FF">float</span> em Python <span style="color: #666666">==</span> double do C <span style="color: #666666">*/</span> 
+    double  vFloat;  
+    
+    <span style="color: #666666">/*</span> para categorias que utilizam strings INT_STR, FLOAT_STR e BOOL_STR <span style="color: #666666">*/</span>
+    char *pStr;    
+};
+typedef union valor Valor;
+</pre></div>
+</pre>
+
+
+<p>
+Neste EP as filas deverão ser implementadas
+por meio de  <font color="red"><b>lista encadeada com cabeça</b></font>
+em que cada célula  é do tipo <font color="green"><tt>CelObjeto</tt></font>.
+Essas filas também serão utilizadas pelo EP4.
+</p>
+
+<p>
+Inicialmente, todas as células serão criadas (<tt>mallocSafe()</tt>) pela
+função <tt>crieFilaItens</tt> (<tt>lexer.c</tt>) que é
+responsável pela análise léxica e que já está completamente feita no esqueleto. 
+Nas demais funções do programa essas células serão reutilizadas, sendo:
+</p><ul>
+  <li> alteradas pela função <tt>itensParaValores()</tt>; e
+  </li><li> eventualmente transferidas para a pilha de execução pela função (<tt>eval()</tt>).
+</li></ul>  
+Todas deverão ser liberadas assim que perderem a sua utilidade. 
+<p></p>
+<p>
+Hmmm. Dependendo de como for feita a implementação  
+da função <tt>eval()</tt>, o programa não necessitará alocar célula alguma do tipo 
+<font color="green"><tt>CelObjeto</tt></font> além das alocadas pela
+função <tt>CrieFileItens()</tt>, com exceção feita à célula cabeça da pilha de execução.
+</p>
+<!--
+<p>
+Resumindo, nas funções que você escrever,
+<font color="red"><b>não deverão</b></font> ser alocadas
+células.<br>
+As suas funções <font color="red"><b>deverão reutilizar</b></font>
+as células criadas durante a análise léxica.<br>
+Assim que uma célula perder a sua utilidade
+deverá ser liberada.
+</p>
+-->
+
+<hr>
+<h2>
+Cálculo das expressões 
+</h2>
+
+<p>
+Para calcular o valor de uma expressão em notação posfixa
+a partir da fila <tt>iniPosfixa</tt>, a função <tt>eval()</tt>
+do seu programa deve utilizar uma <b><font color="red">pilha</font></b>, 
+a chamada <b><font color="red">pilha de execução</font></b>.
+</p>
+<p>
+A pilha de execução deve ser implementada por meio de uma 
+<font color="red"><b>lista encadeada com cabeça</b></font> 
+em que cada elemento é do tipo  <font color="green"><tt>CelObjeto</tt></font>.
+A implementação desta pilha também será utilizada no EP4.
+(Hmmm, isto aqui está meio repetitivo...).
+</p>
+
+<p>
+A sua função <tt>eval()</tt> deve examinar cada célula da fila <tt>iniPosfixa</tt> e:
+</p><ul>
+<li> se a célula examinada contém um número (<tt>FLOAT</tt>), <tt>eval()</tt> deve empilhá-lo;
+</li><li> se a célula examinada contém um operador, <tt>eval()</tt> deve:
+  <ul>
+    <li>desempilhar um ou dois números da pilha, dependendo do tipo do operador;
+    </li><li>calcular o valor da operação correspondente; e
+    </li><li>empilhar o valor calculado.
+  </li></ul>
+</li></ul>
+Ao final, a função deve retornar o endereço da célula do topo da pilha.
+<p></p>
+
+<p>&nbsp;</p>
+<hr>
+<h2>
+Visão geral do programa
+</h2>
+
+<p>
+O programa desenvolvido neste EP lê linhas com expressões na notação posfixa de um arquivo dado ou interativamente a partir do shell.
+As linhas são percorridas e, para cada linha, o programa:
+</p><ol>
+  <li> imprime o número da linha e a expressão na linha; 
+
+  </li><li> cria uma fila de itens léxicos formada pelos itens presentes na expressão (<tt>crieFilaItens()</tt>;
+    
+  </li><li> percorre a fila de itens substituindo no campo <tt>valor</tt> (<tt>itensParaValores()</tt>):
+<ul>
+  <li> ponteiros para strings representando valores (categorias <tt>FLOAT_STR, INT_STR</tt> e <tt>BOOL_STR</tt>)
+       por valores <tt>double</tt> (categoria <tt>FLOAT</tt>); e
+  </li><li> ponteiros para posições em uma tabela de operadores
+       (categoria == <tt>OPER_*</tt>) pela precedência do operador.
+</li></ul>
+  </li><li> percorre a fila com números e operadores representando uma
+       expressão posfixa, calculando o seu valor (<tt>eval()</tt>)
+
+  </li><li> Imprime o valor da expressão.
+</li></ol>
+
+
+<hr>
+<h2>
+Protótipos das funções fornecidas
+</h2>
+
+<p>
+Aqui estão listados os protótipos das funções que estão <font color="red"><b>complemente</b></font> feitas no esqueleto.
+O comportamento das funções está descrito nos comentários que precedem
+as funções nos arquivos do esqueleto.
+</p>
+
+
+<p>
+No módulo <tt>lexer.c</tt> temos a função
+</p><pre class="code"><font color="red">Copiado de lexer.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">CelObjeto <span style="color: #666666">*</span>
+crieFilaItens (char linha[]);
+</pre></div>
+</pre>
+<p></p>
+
+<p>
+No módulo <tt>util.c</tt> temos a função
+</p><pre class="code"><font color="red">Copiado de util.h</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">void 
+<span style="color: #666666">*</span>mallocSafe (size_t nbytes);
+</pre></div>
+</pre>
+<p></p>
+
+<p>
+No módulo <tt>main.c</tt> todas as funções estão completas.
+</p><pre class="code"><font color="red">Copiado de main.c</font>
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">static void 
+mostreUso (char <span style="color: #666666">*</span>nomePrograma);
+
+<span style="color: #AA22FF">int</span> 
+main(<span style="color: #AA22FF">int</span> argc, char <span style="color: #666666">*</span>argv[]);
+</pre></div>
+</pre>
+<p></p>
+
+
+<hr>
+<h2>
+Protótipos das funções que você deve implementar
+</h2>
+<p>&nbsp;</p>
+
+<p>
+Aqui estão listados os protótipos das funções que você deverá escrever.
+O comportamento das funções está descrito nos comentários que precedem
+as funções nos arquivos do esqueleto.
+Você sempre pode escrever mais funções auxiliares se achar conveniente.
+</p>
+
+<p>
+No módulo <tt>objetos.c</tt>
+</p><pre class="code"><!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">void  
+freeObjeto(CelObjeto <span style="color: #666666">*</span>pObj);
+
+void  
+freeListaObjetos(CelObjeto <span style="color: #666666">*</span>iniLista);
+
+void  
+mostreValor(CelObjeto <span style="color: #666666">*</span>pValor);
+
+void  
+mostreObjeto(CelObjeto <span style="color: #666666">*</span>pObj, <span style="color: #AA22FF">int</span> tipoLista);
+
+void  
+mostreListaObjetos(CelObjeto <span style="color: #666666">*</span>iniLista, <span style="color: #AA22FF">int</span> tipoLista);
+</pre></div>
+</pre>
+<p></p>
+
+<p>
+No módulo <tt>eval.c</tt>
+</p><pre class="code"><!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><re style="margin: 0; line-height: 125%">void 
+itensParaValores(CelObjeto <span style="color: #666666">*</span>iniFila);
+
+CelObjeto <span style="color: #666666">*</span>
+<span style="color: #AA22FF">eval</span>(CelObjeto <span style="color: #666666">*</span>iniPosfixa, Bool mostrePilhaExecucao);
+</re></div></pre>
+
+<p></p>
+
+<p>
+Além disso, você deverá definir no arquivo <tt>stack.h</tt> a interface
+de uma pilha e implementar as funções da interface no arquivo
+<tt>stack.c</tt>. A pilha deve ser implementada através 
+de uma lista encadeada com cabeça. 
+</p>
+
+
+
+<!----------------------------------------------------------------------------->
+<hr>
+<h2>
+Descrição dos arquivos do EP
+</h2>
+
+<p>
+Aqui temos uma visão geral dos arquivos que compõem o EP.<br>
+</p>
+
+<p>
+Este exercício-programa é formado por 8 arquivos 8-[.<br>
+O diretório com o esqueleto do EP contém, além desses 8 arquivos, um Makefile para
+gerar o executável do <tt>pitao</tt> do EP.
+Os arquivos no diretório com o esqueleto são
+</p><pre class="saida">prompt/esqueleto&gt; ls -l
+total 192
+-rw-r--r--@ 1 cris  staff  15434 Oct  9 12:50 00-esqueleto.tar
+-rw-r--r--@ 1 cris  staff    777 Oct  9 10:45 Makefile
+-rw-r--r--@ 1 cris  staff   3132 Oct  9 11:29 categorias.h
+-rw-r--r--@ 1 cris  staff   7670 Oct  9 12:40 eval.c
+-rw-r--r--@ 1 cris  staff    661 Oct  9 12:40 eval.h
+-rw-r--r--@ 1 cris  staff  16326 Oct  9 11:10 lexer.c
+-rw-r--r--@ 1 cris  staff    664 Oct  9 11:53 lexer.h
+-rw-r--r--@ 1 cris  staff   5976 Oct  9 11:56 main.c
+-rw-r--r--@ 1 cris  staff   9215 Oct  9 12:40 objetos.c
+-rw-r--r--@ 1 cris  staff   3103 Oct  9 11:27 objetos.h
+-rw-r--r--@ 1 cris  staff   1354 Oct  9 12:43 stack.c
+-rw-r--r--@ 1 cris  staff   1431 Oct  9 12:39 stack.h
+-rw-r--r--@ 1 cris  staff    902 Oct  9 12:42 util.c
+-rw-r--r--@ 1 cris  staff   1033 Oct  9 12:38 util.h
+</pre>
+O arquivo <tt>00-esqueleto.zip</tt> contém todos os 
+arquivos <tt>.h</tt>, <tt>.c</tt> que formam o EP3 junto com o <tt>Makefile</tt>.
+<p></p>
+<p>
+O arquivos que deverão ser manipulados são <tt>objetos.c</tt>, <tt>eval.c</tt>, <tt>stack.h</tt> e <tt>stack.c</tt>.
+No entanto, deverá ser entregue <font color="red"><b>apenas um arquivo <tt>zip</tt> ou <tt>tar.gz</tt></b></font>,
+contendo <font color="red"><b>todos os arquivos .h e .c e Makefile</b></font> no diretório do seu EP3.
+</p>
+<p>
+Os arquivos <tt>objetos.c</tt> e <tt>eval.c</tt> contêm os prótipos das funções que
+deverão ser feitas. Os comentários nos arquivos contêm a
+especificação do comportamento de cada função.
+Os arquivos <tt>stack.h</tt> e <tt>stack.c</tt> estão praticamente vazios aguardando pela
+sua interface predileta de uma pilha e a respectiva implementação através de uma 
+<font color="red"><b>lista encadeada com cabeça</b></font>.
+</p>
+<p>
+Para compilar o programa e gerar o executável basta,
+na linha de comando, digitar <tt>make</tt> (pelo menos no Linux e Mac OS).
+Faça isto assim que baixar o esqueleto e você verá as seguintes mensagens e
+um executável de nome <tt>pitao</tt> será gerado.  
+</p><pre class="saida"> 
+esqueleto&gt; <font color="red">make</font>
+&gt; make
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c util.c
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c objetos.c
+objetos.c:50:14: warning: unused variable 'boolean' [-Wunused-variable]
+static char *boolean[2] = { "False", "True" };
+             ^
+objetos.c:52:14: warning: unused variable 'nomeCategoria' [-Wunused-variable]
+static char *nomeCategoria[MAX_CATEGORIAS] =
+             ^
+2 warnings generated.
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c stack.c
+stack.c:46:1: warning: ISO C requires a translation unit to contain at least one declaration
+      [-Wempty-translation-unit]
+^
+1 warning generated.
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c lexer.c
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c eval.c
+eval.c:62:18: warning: unused variable 'precedencia' [-Wunused-const-variable]
+static const int precedencia[MAX_OPERADORES] =
+                 ^
+1 warning generated.
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c main.c
+gcc util.o objetos.o stack.o lexer.o eval.o main.o -o pitao -lm
+</pre>
+Note que, apesar de no esqueleto o corpo das funções que
+deverão ser feitas estar vazio, o EP compila
+<font color="red">sem erros de sintaxe</font>.
+No entanto, a compilação apresenta 3 avisos: os dois primeiros devido a
+tabelas não utilizadas (ainda) no arquivo <tt>objetos.c</tt> e o terceiro devido 
+ao arquivo <tt>stack.c</tt> não conter código algum.
+<p></p>
+<p>
+Como não há erros de sintaxe, um executável de nome <font color="magenta"><tt>pitao</tt></font> é gerado.
+Ao executar o programa e tentar, por exemplo, calcular o 
+resultado de "<font color="red"><tt>4 + 2</tt></font>" verá 
+</p><pre class="code">prompt&gt; <font color="red">./pitao</font> 
+MAC0121 2019 - EP3
+Pitao (Oct  9 2019, 12:54:06)
+[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)] on Mac OS X
+&gt;&gt;&gt; <font color="red">4 2 +</font> 
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao itensParaValores.
+AVISO: eval.c: Vixe! Ainda nao fiz a funcao eval.
+AVISO: objetos.c: Vixe! Ainda nao fiz a funcao freeListaObjetos.
+&gt;&gt;&gt; 
+</pre>
+O programa não quebrará, ou seja, não veremos um <i>segmentation fault</i>, mas também não veremos
+grande coisa.
+<p></p>
+<p>
+Agora, passamos à descrição dos arquivos.<br>
+Apenas os arquivos <font color="red"><b>objetos.c</b></font>, <font color="red"><b>eval.c</b></font>,
+<font color="red"><b>stach.h</b></font> e <font color="red"><b>stack.c</b></font>
+deverão ser manipulados. Não altere os nomes dos arquivos.
+</p><ul>
+  <!------------------------------------------------------------------------------>
+  <li><font color="blue"><tt>categorias.h</tt></font>.<p>
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Contém declarações de constante que indicam as categorias dos itens léxicos e
+  a declaração do tipo <font color="magenta"><tt>Categoria</tt></font>.
+   Essas constantes e tipo são usados em todos os módulos. 
+  </p><pre class="code"> 
+<!-- HTML generated using hilite.me --><div style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #666666">/*-------------------------------------------------------------*/</span>
+<span style="color: #666666">/*</span> 
+ <span style="color: #666666">*</span> numero de operadores
+ <span style="color: #666666">*</span>    <span style="color: #666666">8</span>        <span style="color: #666666">+</span>      <span style="color: #666666">6</span>      <span style="color: #666666">+</span>    <span style="color: #666666">3</span>    <span style="color: #666666">+</span>     <span style="color: #666666">1</span>     <span style="color: #666666">+</span>     <span style="color: #666666">1</span>
+ <span style="color: #666666">*/</span>               
+<span style="color: #008800; font-style: italic">#define MAX_OPERADORES 19</span>
+
+<span style="color: #666666">/*-------------------------------------------------------------*/</span>
+<span style="color: #666666">/*</span> temos <span style="color: #666666">32</span> categorias de itens lexicos                        <span style="color: #666666">*/</span>
+<span style="color: #008800; font-style: italic">#define MAX_CATEGORIAS  32</span>
+
+enum listaCategorias
+{
+   [<span style="color: #666666">...código removido </span>...]
+};
+typedef enum listaCategorias Categoria; 
+</pre></div>
+  </pre>
+  </li>
+
+  <!------------------------------------------------------------------------------>
+<li><font color="red"><tt>objetos.h</tt></font>.<br>
+
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Aqui está a declaração do tipo <font color="green"><tt>CelObjeto</tt></font> que
+  é <font color="red"><b>fundamental</b></font> para este EP.<br>
+  Este arquivo é a interface para as funções mais básicas deste EP, responsáveis por
+  imprimir e liberar a área alocada para células do tipo <font color="green"><tt>CelObjeto</tt></font>   
+  e listas de células do tipo <font color="green"><tt>CelObjeto</tt></font>.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="red"><tt>objetos.c</tt></font>.<br>
+
+  Contém as implementações correspondentes à interface <tt>objetos.h</tt>.<br>
+
+</li>
+
+  <!------------------------------------------------------------------------------>
+<li><font color="green"><tt>util.h</tt></font>.<br>
+
+  Nada deve ser feito ou alterado neste arquivo.<br>
+  Este arquivo é a interface para tipos (<tt>String, Bool</tt>) e funções (<tt>mallocSafe()</tt>) de uso geral.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>util.c</tt></font>.<br>
+
+  Contém as implementações correspondentes à interface <tt>util.h</tt>.<br>
+
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>lexer.h</tt></font>.<br>
+
+Nada deve ser feito ou alterado neste arquivo.<br>
+É a interface para a anáilise léxica feita pela função <tt>crieFilaItens()</tt>. 
+A declaração da macro/abreviatura do campo <tt>item</tt> (<tt>valor.pStr</tt>) 
+para células que contêm itens léxicos está neste arquivo.
+</li>
+  
+  
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>lexer.c</tt></font>.<br>
+Nada deve ser feito ou alterado neste arquivo. <br>
+Contém as implementações correspondentes à interface <tt>lexer.h</tt>.<br>
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="magenta"><tt>eval.h</tt></font>.<br>
+
+Nada deve ser feito ou alterado neste arquivo. <br>
+Contém a interface para a função que troca um item lexico pelo seu 
+"valor" em uma fila de células do tipo <tt>CelObjeto</tt>
+e para a função que calcula o valor de uma expressão em notação posfixa.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="magenta"><tt>eval.c</tt></font>.<br>
+
+Implementações correspondentes à interface <tt>eval.h</tt>.
+Aqui estão as definições das funções:
+<ul>
+  <li> <tt>itensParaValores()</tt> responsável pela  substituição de strings que representam itens léxicos pelos seus respectivos valores; e
+  </li><li> <tt>eval()</tt> responsável pelo cálculo do valor de uma expressão em notação posfixa.
+</li></ul>
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>stack.h</tt></font>.<br>
+
+Interface para uma pilha.
+</li>
+
+<!------------------------------------------------------------------------------>
+<li><font color="green"><tt>stack.c</tt></font>.<br>
+
+
+Implementação da interface <tt>stack.h</tt>.
+Aqui uma pilha deve ser implementada através de uma lista encadeada com cabeça.
+
+
+<!------------------------------------------------------------------------------>
+</li><li><font color="red"><tt>main.c</tt></font>.<br>
+Nada deve ser feito ou alterado neste arquivo. 
+Contém as definições das funções <tt>main()</tt> e <tt>mostreUso()</tt>.
+</li>
+
+
+<!------------------------------------------------------------------------------>
+<li><font color="blue"><tt>Makefile</tt></font>.<br>
+<!-- <font color="black"><i>Para fazer o EP não é necessário olhar o conteúdo deste arquivo,
+mas é divertido ;-).</i></font><br>-->
+
+Para compilar e gerar o executável <tt>pitao</tt> do
+EP3 basta, no diretório em que estiverem todos os arquivos, digitar <font color="red"><tt>make</tt></font> no prompt.<br>
+
+<pre class="saida">prompt&gt; <font color="red">make</font>
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c objetos.c 
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c stack.c
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c lexer.c 
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c eval.c 
+gcc -Wall -ansi -O2 -pedantic -Wno-unused-result -c main.c 
+gcc util.o objetos.o stack.o lexer.o eval.o main.o -o pitao -lm
+</pre>
+
+
+<!---
+<hr>
+<h2>
+O que &eacute; fornecido no esqueleto
+</h2>
+
+<p>
+Os arquivos em <a href="../esqueleto/">esqueleto</a>
+devem ser utilizados para o desenvolvimento do seu programa.
+</p>
+
+<p>
+Al&eacute;m das declarações descritas anteriormente, 
+o esqueleto cont&eacute;m o programa <tt>main</tt>, que
+realiza a leitura do arquivo de entrada e varre as suas linhas
+chamando as funções descritas nesse enunciado para calcular
+o valor das expressões.
+</p>
+
+-->
+
+<hr>
+<h2>
+Observações
+</h2>
+
+<ul>
+  <li>Teste seu programa com arquivos de entrada diferentes.
+
+  </li><li>O executável <a href="https://www.ime.usp.br/~cris/mac121/eps/ep3/executaveis/"><tt>pitao</tt></a>
+  resolve o problema. Compare os resultados obtidos pelo seu programa
+  com o do executável fornecido. 
+
+  </li><li>Todos os exercícios são
+    <fot color="red"><b>estritamente individuais</b>.
+
+  </fot></li><li>Exercícios atrasados não serão aceitos. 
+
+  </li><li>Exercícios com erros de sintaxe receberão nota 0. 
+
+  </li><li>Indente o seu programa sistematicamente.
+      Uma má apresentação do código  resultará em nota menor.
+      Veja <a href="http://www.gnu.org/prep/standards.html">GNU Coding
+      Standards</a> (<a href="http://www.ime.usp.br/~jose/standards.html">cópia
+      local</a>).
+
+  <!--
+  <li>O seu programa deve conter o mesmo cabeçalho do esqueleto
+  preenchido com os seus dados. Programas sem o cabeçalho, ou com o
+  cabeçalho incompleto, modificado ou não preenchido, terão um
+  desconto automático de ???% da nota. 
+-->
+</li></ul>
+
+<hr>
+<address></address>
+ 
+</li></ul></body></html>
